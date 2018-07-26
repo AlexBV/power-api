@@ -8,7 +8,7 @@ const PaintingType = new GraphQLObjectType({
         id: {type: GraphQLString},
         name: {type: GraphQLString},
         url: {type: GraphQLString},
-        techiques: {type: GraphQLString}
+        techniques: {type: GraphQLString}
     })
 })
 

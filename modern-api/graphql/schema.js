@@ -1,6 +1,6 @@
 const graphql = require('graphql');
-
 const PaintingType = require('./PaintingType');
+const Painting = require('./../models/Painting');
 
 const {
     GraphQLObjectType,
@@ -15,7 +15,7 @@ const RootQuery = new GraphQLObjectType({
             type: PaintingType,
             args:{ id: {type: GraphQLString }},
             resolve(parent, args){
-
+                return Painting.findById(args.id)
             }
         }
     }

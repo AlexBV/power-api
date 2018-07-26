@@ -3,13 +3,17 @@ const mongoose = require('mongoose');
 const Painting = require('./models/Painting');
 const { graphqlHapi, graphiqlHapi} = require('apollo-server-hapi');
 const schema = require('./graphql/schema');
+const Inert = require('inert');
+const HapiSwagger = require('hapi-swagger');
+const Pack = require('./package');
+const Vision = require('vision');
 
 mongoose.connect('mongodb://admin:passw0rd@ds145121.mlab.com:45121/powerfull-api');
 mongoose.connection.once('open', () => {
     console.log('connected to database');
 })
 
-const server = hapi.server({
+const server = new hapi.server({ 
     port:4000,
     host:'localhost'
 });
@@ -31,7 +35,7 @@ const init = async () => {
     await server.register({
         plugin: graphqlHapi,
         options: {
-            path: '/graphgl',
+            path: '/graphql',
             graphqlOptions: {
                 schema
             },
@@ -40,6 +44,20 @@ const init = async () => {
             }
         }
     });
+
+    await server.register([
+        Inert,
+        Vision,
+        {
+            plugin: HapiSwagger,
+            options: {
+                info: {
+                    title: "Painting API",
+                    version: Pack.version
+                }
+            }
+        }
+    ]);
 
     server.route([
         {
@@ -52,6 +70,10 @@ const init = async () => {
         {
             method: 'GET',
             path: '/api/v1/paintings',
+            config : {
+                description: 'Get all the paintings',
+                tags: ['api', 'v1', 'paintings']
+            },
             handler: function(request, reply) {
                 return Painting.find();
             }
@@ -59,6 +81,10 @@ const init = async () => {
         {
             method: 'POST',
             path: '/api/v1/paintings',
+            config : {
+                description: 'Get a specific painting by ID',
+                tags: ['api', 'v1', 'paintings']
+            },
             handler: function(request, reply) {
                 const {name, url, techniques } = request.payload;
                 const painting = new Painting({
